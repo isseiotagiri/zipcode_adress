@@ -1,0 +1,212 @@
+<div class="container">
+  <h1>郵便番号検索</h1>
+  
+  <div class="search-form">
+    <%= form_with url: search_zipcodes_path, method: :get, local: true do |f| %>
+      <div class="form-group">
+        <%= f.label :zipcode, "郵便番号" %>
+        <%= f.text_field :zipcode, value: @zipcode, placeholder: "例: 123-4567", class: "form-control" %>
+        <small class="form-text text-muted">ハイフンあり・なし、どちらでも検索できます</small>
+      </div>
+      <%= f.submit "検索", class: "btn btn-primary" %>
+    <% end %>
+  </div>
+  
+  <% if @error.present? %>
+    <div class="alert alert-danger mt-4">
+      <%= @error %>
+    </div>
+  <% end %>
+  
+  <% if @address_data.present? %>
+    <div class="results mt-4">
+      <h2>検索結果</h2>
+      <% @address_data.each do |address| %>
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title">〒<%= address["zipcode"] %></h5>
+            <p class="card-text">
+              <%= address["address1"] %><%= address["address2"] %><%= address["address3"] %>
+            </p>
+            <p class="card-text text-muted">
+              <%= address["kana1"] %><%= address["kana2"] %><%= address["kana3"] %>
+            </p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <!-- SMS送信フォーム -->
+  <div class="sms-form mt-5">
+    <h2>SMS送信</h2>
+    
+    <% if @sms_error.present? %>
+      <div class="alert alert-danger">
+        <%= @sms_error %>
+      </div>
+    <% end %>
+    
+    <% if @sms_success.present? %>
+      <div class="alert alert-success">
+        <%= @sms_success %>
+      </div>
+    <% end %>
+    
+    <%= form_with url: send_sms_zipcodes_path, method: :post, local: true do |f| %>
+      <div class="form-group">
+        <%= f.label :phone_number, "携帯番号" %>
+        <%= f.text_field :phone_number, value: @phone_number, placeholder: "例: 090-1234-5678", class: "form-control" %>
+        <small class="form-text text-muted">ハイフンあり・なし、どちらでも入力できます</small>
+      </div>
+      
+      <div class="form-group">
+        <%= f.label :text_message, "メッセージ" %>
+        <%= f.text_area :text_message, value: @text_message, placeholder: "送信するメッセージを入力してください", class: "form-control", rows: 4 %>
+        <small class="form-text text-muted">最大660文字まで入力できます</small>
+      </div>
+      
+      <%= f.submit "送信", class: "btn btn-success" %>
+    <% end %>
+  </div>
+
+  <!-- FAX送信フォーム -->
+  <div class="fax-form mt-5">
+    <h2>FAX送信</h2>
+    
+    <% if @fax_error.present? %>
+      <div class="alert alert-danger">
+        <%= @fax_error %>
+      </div>
+    <% end %>
+    
+    <% if @fax_success.present? %>
+      <div class="alert alert-success">
+        <%= @fax_success %>
+      </div>
+    <% end %>
+    
+    <%= form_with url: send_fax_zipcodes_path, method: :post, local: true, multipart: true do |f| %>
+      <div class="form-group">
+        <%= f.label :fax_number, "FAX番号" %>
+        <%= f.text_field :fax_number, value: @fax_number, placeholder: "例: 03-1234-5678", class: "form-control" %>
+        <small class="form-text text-muted">ハイフンあり・なし、どちらでも入力できます</small>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">または</label>
+      </div>
+      
+      <div class="form-group">
+        <%= f.label :contacts_file, "宛先ファイル（CSV）" %>
+        <%= f.file_field :contacts_file, accept: ".csv", class: "form-control" %>
+        <small class="form-text text-muted">CSV形式で複数の宛先を指定できます。1列目にFAX番号を記載してください。</small>
+      </div>
+      
+      <div class="form-group">
+        <%= f.label :document_file, "FAX原稿" %>
+        <%= f.file_field :document_file, accept: ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx", class: "form-control", required: true %>
+        <small class="form-text text-muted">PDF、Word、Excel、PowerPointファイルをアップロードできます</small>
+      </div>
+      
+      <%= f.submit "送信", class: "btn btn-warning" %>
+    <% end %>
+  </div>
+</div>
+
+<style>
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .search-form {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .btn-success {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .btn-warning {
+    background-color: #ffc107;
+    color: #212529;
+  }
+  
+  .alert {
+    padding: 15px;
+    border-radius: 4px;
+  }
+  
+  .alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+  
+  .alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+  
+  .sms-form {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+    border: 2px solid #e9ecef;
+  }
+  
+  .fax-form {
+    background-color: #fff3cd;
+    padding: 20px;
+    border-radius: 5px;
+    border: 2px solid #ffeaa7;
+  }
+  
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .card-body {
+    padding: 15px;
+  }
+  
+  .card-title {
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  
+  .text-muted {
+    color: #6c757d;
+  }
+</style>

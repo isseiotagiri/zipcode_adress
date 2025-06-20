@@ -1,0 +1,15 @@
+ruby '>=3.4.2'
+source 'https://rubygems.org'
+
+# Middleman
+gem 'activesupport', '~> 7.1.5'
+gem 'middleman', '~> 4.6.0'
+gem 'middleman-syntax', '~> 3.4.0'
+gem 'middleman-autoprefixer', '~> 3.0'
+gem 'middleman-sprockets', '~> 4.1'
+gem 'rouge', '~> 3.21'
+gem 'redcarpet', '~> 3.6.1'
+gem 'nokogiri', '~> 1.18.3'
+gem 'webrick'
+
+gem 'font-awesome-sass', '~> 4.5.0'
